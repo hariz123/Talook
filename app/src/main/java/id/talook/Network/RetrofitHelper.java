@@ -9,11 +9,9 @@ import retrofit2.http.GET;
 import retrofit2.http.Url;
 
 public class RetrofitHelper {
-
     public static final String key = "AIzaSyDi4dkQ4h54JGXNDtKICOpTobo0CaKxSR0";
     public static final String url = "https://www.googleapis.com/blogger/v3/blogs/935537652039007175/posts/";
     public static PostService postService = null;
-
     public static PostService getService() {
         if (postService == null) {
             Retrofit retrofit = new Retrofit.Builder()
@@ -28,7 +26,6 @@ public class RetrofitHelper {
     public interface PostService {
         @GET
         Call<PostList> getPostList(@Url String url);
-
         @GET
         Call<Item> getId();
     }

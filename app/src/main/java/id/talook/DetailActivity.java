@@ -1,5 +1,6 @@
 package id.talook;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,41 +8,42 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 public class DetailActivity extends AppCompatActivity {
     ProgressBar progressBar;
-    WebView webView;
-
+    TextView tvDataReceived;
+    ImageView postImage;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        webView = (WebView) findViewById(R.id.detailView);
-        webView.setVisibility(View.INVISIBLE);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new WebChromeClient());
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                Toast.makeText(DetailActivity.this, "Page Started Loading", Toast.LENGTH_SHORT).show();
-            }
+        tvDataReceived = (TextView) findViewById(R.id.detailTV);
+        postImage = (ImageView)findViewById(R.id.imgsrc);
+        String name = getIntent().getStringExtra("id");
+        String text = "" + name;
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                progressBar.setVisibility(View.GONE);
-                webView.setVisibility(View.VISIBLE);
-                Toast.makeText(DetailActivity.this, "Page Loaded", Toast.LENGTH_SHORT).show();
-                String javaScript = "javascript:(function() { var a= document.getElementsByTagName" +
-                        "('header');a[0].hidden='true';a=document.getElementsByClassName" +
-                        "('page_body');a[0].style.padding='0px';})()";
-                webView.loadUrl(javaScript);
-            }
-        });
-        webView.loadUrl(getIntent().getStringExtra("id"));
+        Document document = Jsoup.parse(text);
+        tvDataReceived.setText(document.text());
+        Elements elements = document.select("img");
+        Glide.with(this)
+                .load(elements.get(0).attr("src"))
+                .apply(new RequestOptions().override(350, 550))
+                .into(postImage);
+//        tvDataReceived.setText(text);
+        progressBar.setVisibility(View.GONE);
+
     }
 }
